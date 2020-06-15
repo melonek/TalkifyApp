@@ -3,8 +3,21 @@ const admin = require("firebase-admin");
 
 admin.initializeApp();
 
+const config = {
+  apiKey: "AIzaSyAmvAlYqUq_pqtF1NhIVuWiFkpYmufq3bg",
+  authDomain: "talkifyapp-7a461.firebaseapp.com",
+  databaseURL: "https://talkifyapp-7a461.firebaseio.com",
+  projectId: "talkifyapp-7a461",
+  storageBucket: "talkifyapp-7a461.appspot.com",
+  messagingSenderId: "189219151978",
+  appId: "1:189219151978:web:80dfcd528195920810ea13",
+};
+
 const express = require("express");
 const app = express();
+
+const firebase = require("firebase");
+firebase.initializeApp(config);
 
 app.get("/screams", (req, res) => {
   admin
