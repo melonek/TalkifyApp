@@ -149,7 +149,7 @@ app.post("/login", (req, res) => {
 
   firebase
     .auth()
-    .signInAndRetrieveDataWithCredential(user.email, user.password)
+    .signInWithEmailAndPassword(user.email, user.password)
     .then((data) => {
       return data.getIdToken();
     })
