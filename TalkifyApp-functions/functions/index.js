@@ -151,13 +151,18 @@ app.post("/login", (req, res) => {
     .auth()
     .signInWithEmailAndPassword(user.email, user.password)
     .then((data) => {
-      return data.getIdToken();
+      return data.user.getIdToken();
     })
     .then((token) => {
       return res.json({ token });
     })
     .catch((err) => {
       console.error(err);
+      if (err.code === "auth/wrong-password") {
+        return res
+          .status(430)
+          .json({ general: "Wrong credentials, please try again" });
+      }
       return res.status(500).json({ error: err.code });
     });
 });
