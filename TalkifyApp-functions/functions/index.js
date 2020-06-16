@@ -1,5 +1,6 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
+const app = require("express")();
 
 admin.initializeApp();
 
@@ -13,15 +14,13 @@ const config = {
   appId: "1:189219151978:web:80dfcd528195920810ea13",
 };
 
-const express = require("express");
-const app = express();
-
 const firebase = require("firebase");
 firebase.initializeApp(config);
 
+const db = admin.firestore();
+
 app.get("/screams", (req, res) => {
-  admin
-    .firestore()
+  db.firestore()
     .collection("screams")
     .orderBy("createdAt", "desc")
     .get()
@@ -47,8 +46,7 @@ app.post("/scream", (req, res) => {
     createdAt: new Date().toISOString(),
   };
 
-  admin
-    .firestore()
+  db.firestore()
     .collection("screams")
     .add(newScream)
     .then((doc) => {
@@ -57,6 +55,40 @@ app.post("/scream", (req, res) => {
     .catch((err) => {
       res.status(500).json({ error: "something went wrong" });
       console.error(err);
+    });
+});
+
+// Signup route
+app.post("/signup", (req, res) => {
+  const newUser = {
+    email: req.body.email,
+    password: req.body.password,
+    confirmPassword: req.body.confirmPassword,
+    handle: req.body.handle,
+  };
+
+  // TODO: validate data
+
+  db.doc(`/users/${newUser.handle}`)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        return res.status(400).json({ handle: "this handle is already taken" });
+      } else {
+        return firebase
+          .auth()
+          .createUserWithEmailAndPassword(newUser.email, newUser.password);
+      }
+    })
+    .then((data) => {
+      return data.user.getIdToken();
+    })
+    .then((token) => {
+      return res.status(201).json({ token });
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).json({ error: err.code });
     });
 });
 
