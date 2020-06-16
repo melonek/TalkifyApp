@@ -154,10 +154,11 @@ app.post("/login", (req, res) => {
       return data.getIdToken();
     })
     .then((token) => {
-      return res.json({ token }).catch((err) => {
-        console.error(err);
-        return res.status(500).json({ error: err.code });
-      });
+      return res.json({ token });
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).json({ error: err.code });
     });
 });
 
