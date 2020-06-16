@@ -100,7 +100,7 @@ app.post("/signup", (req, res) => {
     .get()
     .then((doc) => {
       if (doc.exists) {
-        return res.status(400).json({ handle: "this handle is already taken" });
+        return res.status(400).json({ handle: "This handle is already taken" });
       } else {
         return firebase
           .auth()
@@ -131,6 +131,33 @@ app.post("/signup", (req, res) => {
       } else {
         return res.status(500).json({ error: err.code });
       }
+    });
+});
+
+app.post("/login", (req, res) => {
+  const user = {
+    email: req.body.email,
+    password: req.body.password,
+  };
+
+  let errors = {};
+
+  if (isEmpty(user.email)) errors.email = "Must not be empty";
+  if (isEmpty(user.password)) errors.password = "Must not be empty";
+
+  if (Object.keys(errors).length > 0) return res.status(400).json(errors);
+
+  firebase
+    .auth()
+    .signInAndRetrieveDataWithCredential(user.email, user.password)
+    .then((data) => {
+      return data.getIdToken();
+    })
+    .then((token) => {
+      return res.json({ token }).catch((err) => {
+        console.error(err);
+        return res.status(500).json({ error: err.code });
+      });
     });
 });
 
