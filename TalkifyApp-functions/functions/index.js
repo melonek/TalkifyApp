@@ -77,9 +77,13 @@ const FBAuth = (req, res, next) => {
 // Post one scream //
 
 app.post("/scream", FBAuth, (req, res) => {
+  if (req.body.body.trim() === "") {
+    return res.status(400).json({ body: "Body must not be empty" });
+  }
+
   const newScream = {
     body: req.body.body,
-    userHandle: req.user.handle
+    userHandle: req.user.handle,
     createdAt: new Date().toISOString(),
   };
 
